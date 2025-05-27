@@ -2,10 +2,9 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
-from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.label import Label
-from kivy.uix.popup import Popup
 from kivy.config import Config
+from plyer import filechooser
 
 # Настройка окна
 Config.set('graphics', 'width', '800')
@@ -42,9 +41,9 @@ class DataView(BoxLayout):
         """Создание пользовательского интерфейса."""
         print("Building UI...")
         # Верхняя часть: загрузка файла и текстовое поле
-        top_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.1))
+        top_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.1), spacing=10)
 
-        # Кнопка для открытия диалогового окна загрузки файла
+        # Кнопка для открытия нативного диалогового окна
         file_button = Button(text='Load CSV/XLSX', size_hint=(0.5, 1))
         file_button.bind(on_press=self._open_file_chooser)
         top_layout.add_widget(file_button)
@@ -92,26 +91,20 @@ class DataView(BoxLayout):
         print("UI build complete")
 
     def _open_file_chooser(self, instance):
-        """Открытие диалогового окна для выбора файла."""
-        print("Opening file chooser...")
-        content = BoxLayout(orientation='vertical')
-        self.file_chooser = FileChooserListView(filters=['*.csv', '*.xlsx'])
-        content.add_widget(self.file_chooser)
-        select_button = Button(text='Select', size_hint=(1, 0.1))
-        content.add_widget(select_button)
+        """Открытие нативного диалогового окна для выбора файла."""
+        print("Opening native file chooser...")
+        filechooser.open_file(
+            filters=['*.csv', '*.xlsx'],
+            on_selection=self._on_file_selected
+        )
 
-        popup = Popup(title='Select CSV/XLSX file', content=content, size_hint=(0.9, 0.9))
-        select_button.bind(on_press=lambda x: self._on_file_selected(popup))
-        popup.open()
-        print("File chooser opened")
-
-    def _on_file_selected(self, popup):
+    def _on_file_selected(self, selection):
         """Обработка выбора файла."""
         print("File selected")
-        if self.file_chooser.selection:
-            file_path = self.file_chooser.selection[0]
+        if selection:
+            file_path = selection[0]
             self.presenter.on_file_selected(file_path)
-        popup.dismiss()
+        print(f"Selected: {selection}")
 
     def _on_number_input(self, instance, value):
         """Обработка ввода текста."""
