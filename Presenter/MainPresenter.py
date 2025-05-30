@@ -1,4 +1,5 @@
 from Model.models import DanilModel, VadimModel, VladModel
+from Model.ModelHZVlad import ModelHZVlad
 
 class DataPresenter:
     """Presenter для координации View и Models."""
@@ -7,7 +8,7 @@ class DataPresenter:
         self.models = {
             'Danil': DanilModel(),
             'Vadim': VadimModel(),
-            'Vlad': VladModel()
+            'Vlad': ModelHZVlad()
         }
         self.current_file = None
 
