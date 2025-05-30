@@ -74,3 +74,39 @@ class VladModel:
             return table_data, fig, summary
         except Exception as e:
             return [], None, f"Error: {str(e)}"
+
+
+class InflationModel:
+    def __init__(self):
+        self.data = None
+
+    def load_data(self, file_path):
+        """Загрузка данных из CSV-файла"""
+        self.data = pd.read_csv(file_path)
+        return self.data
+
+    def calculate_future_price(self, current_price, years):
+        """Расчет будущей стоимости товара"""
+        if self.data is None or self.data.empty:
+            raise ValueError("Данные не загружены")
+
+        avg_inflation = self.data['Inflation'].mean()
+        return current_price * (1 + avg_inflation / 100) ** years
+
+    def predict_inflation(self, window_size=3, future_years=5):
+        """Прогнозирование методом скользящей средней (опционально)"""
+        if self.data is None:
+            raise ValueError("Данные не загружены")
+
+        # Расчет скользящей средней
+        self.data['MA'] = self.data['Inflation'].rolling(window=window_size).mean().shift(1)
+
+        # Экстраполяция
+        last_value = self.data['MA'].dropna().iloc[-1]
+        future_data = pd.DataFrame({
+            'Year': range(self.data['Year'].max() + 1, self.data['Year'].max() + future_years + 1),
+            'Inflation': [last_value] * future_years,
+            'MA': [last_value] * future_years
+        })
+
+        return pd.concat([self.data, future_data], ignore_index=True)
