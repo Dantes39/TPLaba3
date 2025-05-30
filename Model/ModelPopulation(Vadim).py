@@ -9,6 +9,12 @@ class PopulationModel:
         df = df.rename(columns=lambda x: x.strip())
         if 'Год' not in df.columns or 'Население' not in df.columns:
             raise ValueError("В файле должны быть столбцы 'Год' и 'Население'")
+
+        df['Год'] = pd.to_numeric(df['Год'], errors='coerce')
+        df['Население'] = pd.to_numeric(df['Население'], errors='coerce')
+        df = df.dropna(subset=['Год', 'Население'])
+
+        df['Год'] = df['Год'].astype(int)
         self.data = df[['Год', 'Население']]
         return self.data
 
