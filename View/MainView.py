@@ -1,11 +1,9 @@
-import matplotlib
+from kivy_garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
-matplotlib.use('Agg')
 import sys
 import os
 import numpy as np
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
@@ -20,6 +18,9 @@ from kivy.config import Config
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from plyer import filechooser
+from kivy.uix.boxlayout import BoxLayout
+
+
 
 # Добавляем корень проекта в sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -136,8 +137,8 @@ class DataView(BoxLayout):
         print("Added table view")
 
         # Окно для графика
-        self.plot_widget = MatplotlibWidget(size_hint=(0.5, 1))
-        middle_layout.add_widget(self.plot_widget)
+        self.plot_container = BoxLayout(size_hint=(0.5, 1))
+        middle_layout.add_widget(self.plot_container)
         print("Added plot widget")
 
         self.add_widget(middle_layout)
@@ -187,8 +188,12 @@ class DataView(BoxLayout):
 
     def update_plot(self, figure):
         """Обновление графика."""
-        print("Updating plot")
-        self.plot_widget.update_plot(figure)
+        print("Updating plot (via FigureCanvasKivyAgg)")
+        # Убираем старый график
+        self.plot_container.clear_widgets()
+        # Вставляем новый
+        canvas = FigureCanvasKivyAgg(figure)
+        self.plot_container.add_widget(canvas)
 
     def update_output_text(self, text):
         """Обработка ввода текста."""
