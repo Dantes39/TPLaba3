@@ -37,3 +37,31 @@ class DataPresenter:
                 self.view.update_output_text(f"Error: No model for {name}")
         else:
             self.view.update_output_text("Error: No file selected")
+
+    def on_button_press(self, button_name):
+        if button_name == 'Danil':
+            # Логика для Данила
+            print("Opening Danil's screen")
+
+        elif button_name == 'Vadim':
+            # Логика для Вадима
+            print("Opening Vadim's screen")
+
+        elif button_name == 'Vlad':
+            self.open_inflation()  # Ваш вариант инфляции
+
+    def open_inflation(self):
+        print("Opening inflation screen")
+
+        # Очищаем текущий экран
+        self.view.clear_widgets()
+
+        # Импортируем и создаем ваш экран
+        from ViewInflation import InflationView
+        from PresenterInflation import InflationPresenter
+
+        inflation_view = InflationView()
+        presenter = InflationPresenter(inflation_view)
+
+        # Добавляем на экран
+        self.view.add_widget(inflation_view)
