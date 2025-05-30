@@ -37,11 +37,9 @@ class TableRow(FocusBehavior, BoxLayout):
     selected = BooleanProperty(False)
 
     def __init__(self, **kwargs):
-        super(TableRow, self).__init__(**kwargs)
-        self.orientation = 'horizontal'
+        super(TableRow, self).__init__(orientation='horizontal', **kwargs)
 
     def refresh_view_attrs(self, rv, index, data):
-        """Обновление данных строки."""
         self.index = index
         self.clear_widgets()
         for value in data['row']:
@@ -83,10 +81,11 @@ class MatplotlibWidget(Widget):
 
     def update_plot(self, figure):
         """Обновление графика."""
-        print("Updating plot in MatplotlibWidget")
-        self.figure = figure
-        self.canvas_agg = FigureCanvasAgg(self.figure)
-        self._update_texture()
+        print("Updating plot (via FigureCanvasKivyAgg)")
+        # убираем предыдущий график
+        self.plot_container.clear_widgets()
+        # добавляем новый
+        self.plot_container.add_widget(FigureCanvasKivyAgg(figure))
 
 
 class DataView(BoxLayout):
@@ -126,15 +125,17 @@ class DataView(BoxLayout):
         middle_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.6))
 
         # Окно для таблицы
-        self.table_view = RecycleView(size_hint=(0.5, 1))
-        self.table_view.layout = RecycleBoxLayout(default_size=(None, 30),
-                                                  default_size_hint=(1, None),
-                                                  size_hint=(1, None),
-                                                  height=400,
-                                                  orientation='vertical')
+        self.table_view = RecycleView(size_hint=(0.5, 1)) #Сюда добавляем viewclass, чтобы RecycleView знал, как рисовать строки
+        self.table_view.viewclass = TableRow
+        self.table_view.layout = RecycleBoxLayout(
+            default_size=(None, 30),
+            default_size_hint=(1, None),
+            size_hint=(1, None),
+            height=400,
+            orientation='vertical'
+        )
         self.table_view.data = []
         middle_layout.add_widget(self.table_view)
-        print("Added table view")
 
         # Окно для графика
         self.plot_container = BoxLayout(size_hint=(0.5, 1))
@@ -183,8 +184,13 @@ class DataView(BoxLayout):
 
     def update_table(self, data):
         """Обновление данных таблицы."""
+        """Обновление данных таблицы."""
         print(f"Updating table with data: {data}")
+        # data — список списков: первая строка — заголовки, далее — данные
         self.table_view.data = [{'row': row} for row in data]
+        # говорим RecycleView сразу перерисоваться
+        self.table_view.refresh_from_data()
+
 
     def update_plot(self, figure):
         """Обновление графика."""
