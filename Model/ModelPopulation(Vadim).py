@@ -18,7 +18,7 @@ class PopulationModel:
         self.data = df[['Год', 'Население']]
         return self.data
 
-    def calculate_forecast(self, n, forecast_years):
+    def calculate_growth_stats(self):
         if self.data is None:
             raise ValueError("Данные не загружены")
 
@@ -27,10 +27,19 @@ class PopulationModel:
         df['Прирост (%)'] = df['Население'].pct_change() * 100
         max_increase = df['Прирост (%)'].max()
         max_decrease = df['Прирост (%)'].min()
+        return df, max_increase, max_decrease
 
-        forecast = []
+    def generate_moving_average_forecast(self, n, forecast_years):
+        if self.data is None:
+            raise ValueError("Данные не загружены")
+
+        df = self.data.copy()
+        df.sort_values('Год', inplace=True)
         years = df['Год'].tolist()
         values = df['Население'].tolist()
+
+        forecast = []
+        forecast_years_list = []
 
         for _ in range(forecast_years):
             if len(values) < n:
@@ -38,6 +47,8 @@ class PopulationModel:
             avg = sum(values[-n:]) / n
             forecast.append(avg)
             values.append(avg)
-            years.append(years[-1] + 1)
+            next_year = years[-1] + 1
+            years.append(next_year)
+            forecast_years_list.append(next_year)
 
-        return df, years[-forecast_years:], forecast, max_increase, max_decrease
+        return forecast_years_list, forecast
