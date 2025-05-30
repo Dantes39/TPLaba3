@@ -11,26 +11,30 @@ class InflationView(BoxLayout):
         self.spacing = 10
         self.padding = 20
 
+        # Заголовок
+        self.add_widget(Label(text="Анализ инфляции", size_hint_y=0.1))
+
         # Поля ввода
-        self.file_input = TextInput(hint_text='Файл данных (inflation_data.csv)')
-        self.price_input = TextInput(hint_text='Текущая цена товара')
-        self.years_input = TextInput(hint_text='Прогноз на лет')
+        input_layout = BoxLayout(orientation='vertical', size_hint_y=0.3)
+        self.file_input = TextInput(hint_text='Файл данных (inflation_data.csv)', size_hint_y=0.3)
+        self.price_input = TextInput(hint_text='Текущая стоимость товара', size_hint_y=0.3)
+        self.years_input = TextInput(hint_text='Лет для прогноза', size_hint_y=0.3)
+        input_layout.add_widget(self.file_input)
+        input_layout.add_widget(self.price_input)
+        input_layout.add_widget(self.years_input)
+        self.add_widget(input_layout)
 
         # Кнопки
-        self.calc_btn = Button(text='Рассчитать')
+        btn_layout = BoxLayout(size_hint_y=0.2)
+        self.calculate_btn = Button(text='Рассчитать')
         self.back_btn = Button(text='Назад')
+        btn_layout.add_widget(self.calculate_btn)
+        btn_layout.add_widget(self.back_btn)
+        self.add_widget(btn_layout)
 
-        # Результат
-        self.result_label = Label(text="")
-
-        # Добавление элементов
-        self.add_widget(Label(text="Анализ инфляции"))
-        self.add_widget(self.file_input)
-        self.add_widget(self.price_input)
-        self.add_widget(self.years_input)
-        self.add_widget(self.calc_btn)
-        self.add_widget(self.back_btn)
+        # Результаты
+        self.result_label = Label(text="", size_hint_y=0.2)
         self.add_widget(self.result_label)
 
     def show_result(self, price, years):
-        self.result_label.text = f"Через {years} лет: {price:.2f} руб."
+        self.result_label.text = f"Прогнозируемая стоимость через {years} лет: {price:.2f} руб."

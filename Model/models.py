@@ -54,23 +54,31 @@ class VadimModel:
 
 class VladModel:
     """Модель для обработки данных по нажатию кнопки Vlad."""
-    def process_file(self, file_path, number_input):
-        try:
-            df = pd.read_csv(file_path) if file_path.endswith('.csv') else pd.read_excel(file_path)
-            if number_input:
-                try:
-                    threshold = float(number_input)
-                    df = df[df.iloc[:, 0] > threshold]
-                except ValueError:
-                    pass
-            table_data = df.values.tolist()
-            summary = f"Max of first column: {df.iloc[:, 0].max()}"
-            fig = Figure()
-            ax = fig.add_subplot(111)
-            ax.scatter(range(len(df)), df.iloc[:, 0], color='red')
-            ax.set_title("Scatter Plot (Vlad)")
-            ax.set_xlabel("Index")
-            ax.set_ylabel("Value")
-            return table_data, fig, summary
-        except Exception as e:
-            return [], None, f"Error: {str(e)}"
+
+    def __init__(self):
+        self.data = None
+
+    def load_data(self, file_path):
+        self.data = pd.read_csv(file_path)
+        return self.data
+
+    def calculate_future_price(self, current_price, years):
+        avg_inflation = self.data['Inflation'].mean()
+        return current_price * (1 + avg_inflation / 100) ** years
+
+
+class InflationModel:
+    def __init__(self):
+        self.data = None
+
+    def load_data(self, file_path):
+        self.data = pd.read_csv(file_path)
+        return self.data
+
+    def calculate_future_price(self, current_price, years):
+        avg_inflation = self.data['Inflation'].mean()
+        return current_price * (1 + avg_inflation / 100) ** years
+
+
+
+
